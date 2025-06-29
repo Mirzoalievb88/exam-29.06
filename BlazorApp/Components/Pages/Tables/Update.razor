@@ -1,0 +1,117 @@
+@page "/tables/update/{id:int}"
+@using Application.DTOs.TableDTOs
+@inject ITableService TableService
+@inject NavigationManager Navigation
+
+<style>
+    .form-wrapper {
+        max-width: 500px;
+        margin: 50px auto;
+        padding: 30px;
+        background: #fdfdfd;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #333;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        color: #555;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: border-color 0.3s;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #0078d4;
+    }
+
+    .form-check {
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-save {
+        width: 100%;
+        padding: 10px;
+        background-color: #0078d4;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .btn-save:hover {
+        background-color: #005fa3;
+    }
+</style>
+
+<div class="form-wrapper">
+    <h2>Редактировать столик</h2>
+
+    <EditForm Model="@model" OnValidSubmit="Save" FormName="UpdateTable">
+
+        <div class="form-group">
+            <label>Номер столика</label>
+            <InputNumber @bind-Value="model.Number" class="form-input" />
+        </div>
+
+        <div class="form-group">
+            <label>Количество мест</label>
+            <InputNumber @bind-Value="model.Seats" class="form-input" />
+        </div>
+
+        <div class="form-check">
+            <InputCheckbox @bind-Value="model.IsReserved" />
+            <label>Зарезервирован</label>
+        </div>
+
+        <button type="submit" class="btn-save">💾 Сохранить</button>
+    </EditForm>
+</div>
+
+@code {
+    private UpdateTableDto model = new();
+    [Parameter] public int id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        model = new UpdateTableDto
+        {
+            Number = model.Number,
+            Seats = model.Seats,
+            IsReserved = model.IsReserved
+        };
+    }
+
+    private async Task Save()
+    {
+        await TableService.UpdateTableAsync(id, model);
+        Navigation.NavigateTo("/tables");
+    }
+}

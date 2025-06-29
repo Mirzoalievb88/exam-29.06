@@ -1,0 +1,117 @@
+@page "/reservations/create"
+@using Application.DTOs.CustomerDTOs
+@using Application.DTOs.ReservationDTOs
+@using Application.DTOs.TableDTOs
+@inject IReservationService ReservationService
+@inject ICustomerService CustomerService
+@inject ITableService TableService
+@inject NavigationManager Navigation
+
+<style>
+    .form-wrapper {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 30px;
+        background: #fefefe;
+        border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        font-family: 'Segoe UI', sans-serif;
+    }
+    h2 { text-align:center; margin-bottom: 25px; color:#333; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 6px; font-weight: 600; color: #555; }
+    select.form-select, input.form-input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #bbb;
+        border-radius: 8px;
+        font-size: 15px;
+    }
+    select.form-select:focus, input.form-input:focus {
+        outline: none;
+        border-color: #0078d4;
+    }
+    button.btn-primary {
+        width: 100%;
+        padding: 10px;
+        background-color: #0078d4;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    button.btn-primary:hover {
+        background-color: #005fa3;
+    }
+    .validation-summary {
+        color: red;
+        margin-bottom: 15px;
+    }
+</style>
+
+<div class="form-wrapper">
+    <h2>Добавить бронь</h2>
+
+    <EditForm Model="@model" OnValidSubmit="HandleCreate" FormName="CreateReservation">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="validation-summary" />
+
+        <div class="form-group">
+            <label>Столик</label>
+            <select @bind="model.TableId" class="form-select">
+                <option value="">-- Выберите столик --</option>
+                @foreach (var t in tables)
+                {
+                    <option value="@t.Id">@($"Столик {t.Number}, места: {t.Seats}")</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Клиент</label>
+            <select @bind="model.CustomerId" class="form-select">
+                <option value="">-- Выберите клиента --</option>
+                @foreach (var c in customers)
+                {
+                    <option value="@c.Id">@c.FullName</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Дата и время брони</label>
+            <InputDate @bind-Value="model.ReservationDate" class="form-input" />
+        </div>
+
+        <button type="submit" class="btn-primary">Создать бронь</button>
+    </EditForm>
+</div>
+
+@code {
+    private CreateReservationDto model = new();
+    private List<GetTableDto> tables = new();
+    private List<GetCustomerDto> customers = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var tablesResult = await TableService.GetAllTablesAsync();
+        if (tablesResult.IsSuccess && tablesResult.Data != null)
+            tables = tablesResult.Data;
+
+        var customersResult = await CustomerService.GetAllCustomersAsync();
+        if (customersResult.IsSuccess && customersResult.Data != null)
+            customers = customersResult.Data;
+    }
+
+    private async Task HandleCreate()
+    {
+        var res = await ReservationService.CreateReservationAsync(model);
+        if (res.IsSuccess)
+            Navigation.NavigateTo("/reservations");
+        else
+            Console.WriteLine(res.Massege);
+    }
+}

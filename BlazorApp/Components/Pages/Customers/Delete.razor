@@ -1,0 +1,75 @@
+@page "/customers/delete/{id:int}"
+@inject ICustomerService CustomerService
+@inject NavigationManager Navigation
+
+<style>
+    .delete-wrapper {
+        max-width: 400px;
+        margin: 60px auto;
+        padding: 25px;
+        background: #fff8f8;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(255, 50, 50, 0.15);
+        font-family: 'Segoe UI', sans-serif;
+        text-align: center;
+        color: #b22222;
+    }
+
+    .delete-wrapper h2 {
+        margin-bottom: 20px;
+        font-weight: 700;
+    }
+
+    .btn-delete {
+        background-color: #b22222;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        font-size: 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-right: 10px;
+    }
+
+    .btn-delete:hover {
+        background-color: #7a1616;
+    }
+
+    .btn-cancel {
+        background-color: #777;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        font-size: 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .btn-cancel:hover {
+        background-color: #444;
+    }
+</style>
+
+<div class="delete-wrapper">
+    <h2>Удалить клиента?</h2>
+    <p>Вы уверены, что хотите удалить этого клиента (ID: @id)? Это действие нельзя отменить.</p>
+
+    <button class="btn-delete" @onclick="HandleDelete">Удалить</button>
+    <button class="btn-cancel" @onclick="Cancel">Отмена</button>
+</div>
+
+@code {
+    [Parameter] public int id { get; set; }
+    private async Task HandleDelete()
+    {
+        await CustomerService.DeleteCustomerAsync(id);
+        Navigation.NavigateTo("/customers");
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/customers");
+    }
+}

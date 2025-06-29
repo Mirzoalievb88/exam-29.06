@@ -1,0 +1,47 @@
+@page "/Tables"
+@using Application.DTOs.TableDTOs
+@inject ITableService courseService
+@rendermode InteractiveServer
+
+<h3>📘 Courses</h3>
+
+<a href="/Tables/create" class="btn btn-primary mb-3">Add New</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Number</th>
+            <th>Seats</th>
+            <th>IsReserved</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in tables)
+        {
+            <tr>
+                <td>@p.Number</td>
+                <td>@p.Seats</td>
+                <td>@p.IsReserved</td>
+                <td>
+                    <a href="/Tables/Update/@p.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="/Tables/Delete/@p.Id" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+    private List<GetTableDto> tables = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await courseService.GetAllTablesAsync();
+        if (result.IsSuccess)
+        {
+            tables = result.Data!;
+        }
+    }
+}

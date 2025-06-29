@@ -1,0 +1,110 @@
+@page "/customers/update/{id:int}"
+@using Application.DTOs.CustomerDTOs
+@inject ICustomerService CustomerService
+@inject NavigationManager Navigation
+
+<style>
+    .form-wrapper {
+        max-width: 500px;
+        margin: 40px auto;
+        padding: 30px;
+        background: #fefefe;
+        border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #333;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        color: #555;
+    }
+
+    input.form-input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #bbb;
+        border-radius: 8px;
+        font-size: 15px;
+    }
+
+    input.form-input:focus {
+        outline: none;
+        border-color: #0078d4;
+    }
+
+    button.btn-primary {
+        width: 100%;
+        padding: 10px;
+        background-color: #0078d4;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    button.btn-primary:hover {
+        background-color: #005fa3;
+    }
+
+    .validation-summary {
+        color: red;
+        margin-bottom: 15px;
+    }
+</style>
+
+<div class="form-wrapper">
+    <h2>Редактировать клиента</h2>
+
+    <EditForm Model="@model" OnValidSubmit="Save">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="validation-summary" />
+
+        <div class="form-group">
+            <label>ФИО</label>
+            <InputText @bind-Value="model.FullName" class="form-input" />
+        </div>
+
+        <div class="form-group">
+            <label>Телефон</label>
+            <InputText @bind-Value="model.Phone" class="form-input" />
+        </div>
+
+        <button type="submit" class="btn-primary">Сохранить</button>
+    </EditForm>
+</div>
+
+@code {
+    private UpdateCustomerDto model = new();
+    [Parameter] public int id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        model = new UpdateCustomerDto
+        {
+            FullName = model.FullName,
+            Phone = model.Phone,
+        };
+    }
+
+    private async Task Save()
+    {
+        await CustomerService.UpdateCustomerAsync(id, model);
+        Navigation.NavigateTo("/tables");
+    }
+}

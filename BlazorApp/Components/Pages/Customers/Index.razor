@@ -1,0 +1,121 @@
+@page "/customers"
+@using Application.DTOs.CustomerDTOs
+@inject ICustomerService CustomerService
+@inject NavigationManager Navigation
+
+<style>
+    .table-wrapper {
+        max-width: 800px;
+        margin: 40px auto;
+        font-family: 'Segoe UI', sans-serif;
+    }
+    h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #333;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #ccc;
+        text-align: left;
+    }
+    th {
+        background-color: #f4f4f4;
+        font-weight: 600;
+    }
+    tr:hover {
+        background-color: #f0f8ff;
+    }
+    button.action-btn {
+        margin-right: 5px;
+        padding: 6px 10px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        color: white;
+        font-weight: 600;
+        transition: background-color 0.3s;
+    }
+    button.edit-btn {
+        background-color: #0078d4;
+    }
+    button.edit-btn:hover {
+        background-color: #005fa3;
+    }
+    button.delete-btn {
+        background-color: #b22222;
+    }
+    button.delete-btn:hover {
+        background-color: #7a1616;
+    }
+    button.create-btn {
+        margin-bottom: 20px;
+        padding: 10px 15px;
+        background-color: #0078d4;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    button.create-btn:hover {
+        background-color: #005fa3;
+    }
+</style>
+
+<div class="table-wrapper">
+    <h2>Клиенты</h2>
+    <a href="/Customers/create" class="btn btn-primary mb-3">Add New</a>
+
+    @if (customers == null)
+    {
+        <p>Загрузка...</p>
+    }
+    else if (!customers.Any())
+    {
+        <p>Нет клиентов.</p>
+    }
+    else
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>ФИО</th>
+                    <th>Телефон</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var c in customers)
+                {
+                    <tr>
+                        <td>@c.Id</td>
+                        <td>@c.FullName</td>
+                        <td>@c.Phone</td>
+                        <td>
+                            <button class="action-btn edit-btn" @onclick="@(()=>Navigation.NavigateTo($"/customers/update/{c.Id}"))">Редактировать</button>
+                            <button class="action-btn delete-btn" @onclick="@(()=>Navigation.NavigateTo($"/customers/delete/{c.Id}"))">Удалить</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    private List<GetCustomerDto>? customers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var res = await CustomerService.GetAllCustomersAsync();
+        if (res.IsSuccess)
+            customers = res.Data;
+    }
+}

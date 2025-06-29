@@ -1,0 +1,122 @@
+@page "/reservations"
+@using Application.DTOs.ReservationDTOs
+@inject IReservationService ReservationService
+@inject NavigationManager Navigation
+
+<style>
+    .table-wrapper {
+        max-width: 900px;
+        margin: 40px auto;
+        font-family: 'Segoe UI', sans-serif;
+    }
+    h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #333;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #ccc;
+        text-align: left;
+    }
+    th {
+        background-color: #f4f4f4;
+        font-weight: 600;
+    }
+    tr:hover {
+        background-color: #f0f8ff;
+    }
+    button.action-btn {
+        margin-right: 5px;
+        padding: 6px 10px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        color: white;
+        font-weight: 600;
+        transition: background-color 0.3s;
+    }
+    button.edit-btn {
+        background-color: #0078d4;
+    }
+    button.edit-btn:hover {
+        background-color: #005fa3;
+    }
+    button.delete-btn {
+        background-color: #b22222;
+    }
+    button.delete-btn:hover {
+        background-color: #7a1616;
+    }
+    button.create-btn {
+        margin-bottom: 20px;
+        padding: 10px 15px;
+        background-color: #0078d4;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    button.create-btn:hover {
+        background-color: #005fa3;
+    }
+</style>
+
+<div class="table-wrapper">
+    <h2>Бронирования</h2>
+    <a href="/reservations/create" class="btn btn-primary mb-3">Add New</a>
+
+    @if (reservations == null)
+    {
+        <p>Загрузка...</p>
+    }
+    else if (!reservations.Any())
+    {
+        <p>Нет бронирований.</p>
+    }
+    else
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Столик</th>
+                    <th>Клиент</th>
+                    <th>Дата брони</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var r in reservations)
+                {
+                    <tr>
+                        <td>@r.Id</td>
+                        <td>@r.CustomerFullName</td>
+                        <td>@r.ReservationDate.ToString("g")</td>
+                        <td>
+                            <button class="action-btn edit-btn" @onclick="@(()=>Navigation.NavigateTo($"/reservations/update/{r.Id}"))">Редактировать</button>
+                            <button class="action-btn delete-btn" @onclick="@(()=>Navigation.NavigateTo($"/reservations/delete/{r.Id}"))">Удалить</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    private List<GetReservationDto>? reservations;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var res = await ReservationService.GetAllReservationsAsync();
+        if (res.IsSuccess)
+            reservations = res.Data;
+    }
+}
