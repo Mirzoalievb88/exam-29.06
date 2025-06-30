@@ -2,6 +2,7 @@
 @using Application.DTOs.CustomerDTOs
 @inject ICustomerService CustomerService
 @inject NavigationManager Navigation
+@rendermode InteractiveServer
 
 <style>
     .form-wrapper {
@@ -76,7 +77,5 @@
         var res = await CustomerService.CreateCustomerAsync(model);
         if (res.IsSuccess)
             Navigation.NavigateTo("/customers");
-        else
-            Console.WriteLine(res.Massege);
     }
 }

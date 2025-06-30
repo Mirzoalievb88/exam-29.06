@@ -2,6 +2,7 @@
 @using Application.DTOs.CustomerDTOs
 @inject ICustomerService CustomerService
 @inject NavigationManager Navigation
+@rendermode InteractiveServer
 
 <style>
     .form-wrapper {
@@ -105,6 +106,6 @@
     private async Task Save()
     {
         await CustomerService.UpdateCustomerAsync(id, model);
-        Navigation.NavigateTo("/tables");
+        Navigation.NavigateTo("/Customers");
     }
 }
